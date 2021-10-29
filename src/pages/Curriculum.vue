@@ -39,7 +39,7 @@ export default {
         async fetchCurriculum(){
             console.log('fetched curriculum');
             const response = await axios.get(`api/repos/suitcaseCoder/sample-content/contents/js-1/one.md`)
-            console.log(response);
+            console.log(response.data.url);
             return response;
         },
         loadFile(){
@@ -57,14 +57,13 @@ export default {
             async editContent(fileName){
                 console.log("edit clicked");
                 console.log("file name: " + fileName);
-                const res = await fetch(`api/repos/suitcaseCoder/sample-content/contents/js-1/${fileName}`,
-                {
+                const res = await fetch(`api/repos/suitcaseCoder/sample-content/contents/js-1/${fileName}`,{
                 method: "PUT",
                 headers: {
                     "Content-type": "Application/json",
-                    Accept: "application/vnd.github.v3+json",
-                    "Access-Control-Allow-Origin": "null",
-                    Authentication: `token ${process.env.GITHUB_TOKEN}`,
+                    "Accept": "application/vnd.github.v3+json",
+                    // "Access-Control-Allow-Origin": "null",
+                    "Authentication": `token ${process.env.GITHUB_TOKEN}`,
                     // "PRIVATE-TOKEN": `${GITHUB_TOKEN}`
                 },
                 credentials: "include",
@@ -75,7 +74,7 @@ export default {
                     sha: "5d68bcc8b81bd0fb8bc1eef86382cd065838ae9d",
                     message: "commit msg",
                     // creates Base64-encoded ASCII string from js string. necessary?
-                    content: btoa("edited content"),
+                    content: "edited content"
                 },
                 })
                 const updated = await res.json();
