@@ -13,6 +13,8 @@ import axios from 'axios';
 // import Paragraph from "../components/Paragraph.vue"
 import Button from "../components/Button.vue"
 // import Response from "../components/Response.vue"
+const { Octokit } = require("@octokit/core");
+const octokit = new Octokit({ auth: process.env.VUE_APP_GITHUB_API_KEY });
 
 export default {
     name: 'Curriculum',
@@ -37,10 +39,19 @@ export default {
       },
     methods: {
         async fetchCurriculum(){
-            console.log('fetched curriculum');
-            const response = await axios.get(`api/repos/suitcaseCoder/sample-content/contents/js-1/one.md`)
-            console.log(response.data.url);
-            return response;
+            // https://github.com/SuitcaseCoder/sample-content/blob/main/js-1/one.md
+            // 'GET /repos/{owner}/{repo}/contents/{path}'
+            const res = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
+            owner: 'SuitcaseCoder',
+            repo: 'sample-content',
+            path: 'one.md',
+            })
+            console.log(res);
+            return res;
+            // console.log('fetched curriculum');
+            // const response = await axios.get(`api/repos/suitcaseCoder/sample-content/contents/js-1/one.md`)
+            // console.log(response.data.url);
+            // return response;
         },
         loadFile(){
                 axios({
@@ -54,29 +65,34 @@ export default {
                 console.error("error getting file: " + error);
                 });
         },
-        async editContent(fileName){
+        async editContent(){
+            const updatedContent = 
+            "### Title \n ## sub title \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
+ 
             console.log("edit clicked");
-            console.log("file name: " + fileName);
-            const res = await fetch(`/api/repos/suitcaseCoder/sample-content/contents/js-1/${fileName}`,{
-            method: "PUT",
-            headers: {
-                // "Content-type": "Application/json",
-                // "Accept": "application/vnd.github.v3+json",
-                // "Access-Control-Allow-Origin": "null",
-                "Authentication": `token ${process.env.GITHUB_TOKEN}`,
-                // "PRIVATE-TOKEN": `${GITHUB_TOKEN}`
-            },
-            // credentials: "include",
-            body: {
-                owner: "suitcasecoder",
-                repo: "sample-content",
-                path: "js-1/one.md",
-                sha: "5d68bcc8b81bd0fb8bc1eef86382cd065838ae9d",
-                message: "commit msg",
-                // creates Base64-encoded ASCII string from js string. necessary?
-                content: "edited content"
-            },
+            // /repos/{owner}/{repo}/contents/js-1/{path}
+            const res = await octokit.request('PUT /repos/{owner}/{repo}/contents/js-1/{path}', {
+                owner: 'suitcaseCoder',
+                repo: 'sample-content',
+                path: 'one.md',
+                message: 'message',
+                content: window.btoa(updatedContent),
+                sha: '3c0ecafb9258c6a39b4f016c7db903fd2d1ea0b9'
             })
+            // const res = await octokit.request(`PUT  /repos/{owner}/{repo}/contents/js-1/{path}`, {
+            //     headers: {
+            //         Authorization: `token ${process.env.VUE_APP_GITHUB_API_KEY}`,
+            //         accept: "application/vnd.github.v3+json"
+            //     },
+            //    data: {
+            //         owner: 'suitcaseCoder',
+            //         repo: 'sample-content',
+            //         path: 'one.md',
+            //         message: 'message',
+            //         content: 'updated content'
+            //     }
+            // })  
+            console.log(res);
             const updated = await res.json();
             console.log(updated);
             this.updatedContent = updated;

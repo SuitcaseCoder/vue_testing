@@ -3,6 +3,8 @@ module.exports = {
     proxy: {
       "^/api":
        {
+        //  https doesn't re-direct
+        //  http blocked by cors
         target: "https://api.github.com",
         changeOrigin: true,
         logLevel: "debug",
