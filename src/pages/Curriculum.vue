@@ -45,6 +45,8 @@ export default {
             owner: 'SuitcaseCoder',
             repo: 'sample-content',
             path: 'one.md',
+            branch: 'platform_updates'
+
             })
             console.log(res);
             return res;
@@ -67,7 +69,7 @@ export default {
         },
         async editContent(){
             const updatedContent = 
-            "### Title \n ## sub title \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
+            "### Title \n ## sub title \n ## update number: 4 \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
  
             console.log("edit clicked");
             // /repos/{owner}/{repo}/contents/js-1/{path}
@@ -77,7 +79,8 @@ export default {
                 path: 'one.md',
                 message: 'message',
                 content: window.btoa(updatedContent),
-                sha: '3c0ecafb9258c6a39b4f016c7db903fd2d1ea0b9'
+                sha: "fde6b903877d9f92713dcbba7ca5bbdec79d8cda",
+                branch: 'platform_updates'
             })
             // const res = await octokit.request(`PUT  /repos/{owner}/{repo}/contents/js-1/{path}`, {
             //     headers: {
