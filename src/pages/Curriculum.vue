@@ -1,7 +1,7 @@
 <template>
     <div class="curriculum-container">
         <!-- <Response :content="this.download_url" /> -->
-        <Button @btn-click="editContent()" text="edit" />
+        <Button @btn-click="getRepoForEdit()" text="edit" />
         <article v-html="compiledHtml"></article>
 
     </div>    
@@ -34,13 +34,16 @@ export default {
             editSHA: ""
             
         }
-    },    computed: {
+    },    
+    computed: {
         compiledHtml: function() {
           return this.input;
-        }
-      },
+        },
+
+    }
+      ,
     methods: {
-        
+
         async fetchCurriculum(){
             console.log("ON PAGE LOAD")
             const res = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
@@ -65,12 +68,10 @@ export default {
                 console.error("error getting file: " + error);
                 });
         },
-        async editContent(){
-            const updatedContent = 
-                "# update number: 6 \n ### Title \n ## sub title \n another sub title  \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
 
-            // get SHA from branch we want to edit:
-            const branchToUpdate = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
+        async getRepoForEdit(){
+            // get SHA + other info from branch we want to edit:
+            const res = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
                 owner: 'SuitcaseCoder',
                 repo: 'sample-content',
                 path: 'one.md',
@@ -78,8 +79,23 @@ export default {
                 // ref must reference the correct branch which from you want the SHA to then make a PUT request to
                 ref: 'platform_updates'
             })
-            this.editSHA = branchToUpdate.data.sha;
-            console.log(this.editSHA);
+            const sha = res.data.sha;
+            console.log("GET SHA FOR EDIT")
+            console.log(sha);
+            this.editSHA = sha;
+            this.handlePutRequest(sha)
+
+            // return res.data.sha;
+        },
+        async handlePutRequest(repoSHA){
+            console.log("ON HANDLE PUT REQUEST")
+            console.log(repoSHA)
+            var today = new Date();
+            var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+            
+            // updated content to replace existing content
+            const updatedContent = 
+                "# last updated at: " + time + " \n ### Title \n ## sub title \n another sub title  \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
 
             const res = await octokit.request('PUT /repos/{owner}/{repo}/contents/js-1/{path}', {
                 owner: 'suitcaseCoder',
@@ -87,22 +103,23 @@ export default {
                 path: 'one.md',
                 message: 'message',
                 content: window.btoa(updatedContent),
-                sha: this.editSHA,
+                sha: repoSHA,
                 branch: 'platform_updates'
-            }) 
+            })
+            console.log('PUT REQUEST response:');
             console.log(res);
-            const updated = await res.json();
-            console.log(updated);
-            this.updatedContent = updated;
+            return res
         }
+
     },
     async created (){
         const data = await this.fetchCurriculum();
-        this.editSHA = "";
+        // this.editSHA = await this.getRepoForEdit();
         this.data = data.data;
         this.download_url = data.data.download_url;
         this.fileName = data.data.name;
         this.loadFile();
+
     }
     
 }
