@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Curriculum from '../pages/Curriculum';
 import Homepage from '../pages/Homepage';
 
+
 const routes = [
     // Curriculum route: 
         {

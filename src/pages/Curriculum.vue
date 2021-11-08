@@ -1,8 +1,19 @@
 <template>
     <div class="curriculum-container">
+        <section>
+            <p>BUTTON TO TRIGGER EDIT</p>
         <!-- <Response :content="this.download_url" /> -->
         <Button @btn-click="getRepoForEdit()" text="edit" />
         <article v-html="compiledHtml"></article>
+        </section>
+        <section>
+            <p>MARKDOWN EDITOR</p>
+        <!-- <markdown-editor  :markdownContent="markdown" @update-markdown="updateMd" /> -->
+        </section>
+        <section>
+            <p>MARKDOWN DISPLAYER</p>
+             <!-- <markdown-displayer :markdownContent="markdown" /> -->
+        </section>
 
     </div>    
 
@@ -13,6 +24,11 @@ import axios from 'axios';
 // import Paragraph from "../components/Paragraph.vue"
 import Button from "../components/Button.vue"
 // import Response from "../components/Response.vue"
+
+// MARDOWN EDITOR/DISPLAYER
+// import MarkdownEditor from "../components/MarkdownEditor.vue"
+// import MardownDisplayer from "../components/MarkdownDisplayer.vue"
+
 const { Octokit } = require("@octokit/core");
 const octokit = new Octokit({ auth: process.env.VUE_APP_GITHUB_API_KEY });
 
@@ -21,7 +37,9 @@ export default {
     components: {
         // Paragraph,
         Button,
-        // Response
+        // Response,
+        // MarkdownEditor,
+        // MardownDisplayer
     
     },
     data(){
@@ -31,7 +49,8 @@ export default {
             fileName: "",
             input: "",
             updatedContent: {},
-            editSHA: ""
+            editSHA: "",
+            // markdown: `# Hello World`,
             
         }
     },    
@@ -45,7 +64,6 @@ export default {
     methods: {
 
         async fetchCurriculum(){
-            console.log("ON PAGE LOAD")
             const res = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
             owner: 'SuitcaseCoder',
             repo: 'sample-content',
@@ -53,7 +71,7 @@ export default {
             branch: 'platform_updates'
             })
             console.log(res);
-            console.log(res.data.sha);
+            console.log("on page load, sha: ", res.data.sha);
             return res;
         },
         loadFile(){
@@ -71,6 +89,7 @@ export default {
 
         async getRepoForEdit(){
             // get SHA + other info from branch we want to edit:
+            // change to contentRes
             const res = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
                 owner: 'SuitcaseCoder',
                 repo: 'sample-content',
@@ -80,16 +99,25 @@ export default {
                 ref: 'platform_updates'
             })
             const sha = res.data.sha;
-            console.log("GET SHA FOR EDIT")
-            console.log(sha);
+            console.log("res.data on get request platform branch: ", res.data);
+            console.log("GET SHA FOR EDIT from platform_branch", sha)
             this.editSHA = sha;
             this.handlePutRequest(sha)
 
             // return res.data.sha;
         },
+
+        // ---- MARKDOWN EDITOR & DISPLAYER
+        // updateMd(updatedMarkdown) { 
+        // this.markdown = updatedMarkdown;
+        // },
+        //     say(message) {
+        // alert(message)
+        // },
+
+        // ------- PUT REQUEST TO UPDATE GITHUB
         async handlePutRequest(repoSHA){
-            console.log("ON HANDLE PUT REQUEST")
-            console.log(repoSHA)
+            console.log("SHA on handlePutRequest:", repoSHA)
             var today = new Date();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
             
@@ -106,8 +134,7 @@ export default {
                 sha: repoSHA,
                 branch: 'platform_updates'
             })
-            console.log('PUT REQUEST response:');
-            console.log(res);
+            console.log('PUT REQUEST... response.data:', res.data);
             return res
         }
 
