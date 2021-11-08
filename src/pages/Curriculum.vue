@@ -3,7 +3,7 @@
         <section>
             <p>BUTTON TO TRIGGER EDIT</p>
         <!-- <Response :content="this.download_url" /> -->
-        <Button @btn-click="getRepoForEdit()" text="edit" />
+        <Button @btn-click="getContentSHA()" text="edit" />
         <article v-html="compiledHtml"></article>
         </section>
         <section>
@@ -23,7 +23,7 @@
 import axios from 'axios';
 // import Paragraph from "../components/Paragraph.vue"
 import Button from "../components/Button.vue"
-// import Response from "../components/Response.vue"
+// import Success from "../pages/Success.vue";
 
 // MARDOWN EDITOR/DISPLAYER
 // import MarkdownEditor from "../components/MarkdownEditor.vue"
@@ -71,7 +71,7 @@ export default {
             branch: 'platform_updates'
             })
             console.log(res);
-            console.log("on page load, sha: ", res.data.sha);
+            console.log("on page load, data: ", res.data);
             return res;
         },
         loadFile(){
@@ -87,10 +87,10 @@ export default {
                 });
         },
 
-        async getRepoForEdit(){
+        async getContentSHA(){
             // get SHA + other info from branch we want to edit:
             // change to contentRes
-            const res = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
+            const contentSHAResponse = await octokit.request('GET /repos/{owner}/{repo}/contents/js-1/{path}', {
                 owner: 'SuitcaseCoder',
                 repo: 'sample-content',
                 path: 'one.md',
@@ -98,11 +98,11 @@ export default {
                 // ref must reference the correct branch which from you want the SHA to then make a PUT request to
                 ref: 'platform_updates'
             })
-            const sha = res.data.sha;
-            console.log("res.data on get request platform branch: ", res.data);
-            console.log("GET SHA FOR EDIT from platform_branch", sha)
-            this.editSHA = sha;
-            this.handlePutRequest(sha)
+            const contentSHA = contentSHAResponse.data.sha;
+            console.log("res.data on get request platform branch: ", contentSHAResponse.data);
+            console.log("GET SHA FOR EDIT from platform_branch", contentSHA)
+            // this.editSHA = sha;
+            this.handleUpdateContent(contentSHA)
 
             // return res.data.sha;
         },
@@ -116,16 +116,17 @@ export default {
         // },
 
         // ------- PUT REQUEST TO UPDATE GITHUB
-        async handlePutRequest(repoSHA){
-            console.log("SHA on handlePutRequest:", repoSHA)
+        async handleUpdateContent(repoSHA){
+
+            console.log("SHA on handleUpdateContent:", repoSHA)
             var today = new Date();
             var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
             
             // updated content to replace existing content
             const updatedContent = 
-                "# last updated at: " + time + " \n ### Title \n ## sub title \n another sub title  \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
+                "# last updated on: " +  today + " at: " + time + " \n ### Title \n ## sub title \n another sub title  \n new line over here some text blah blah blah blah \n ``` <h1> hello world </h1> ``` \n some more text over here blah blah oaisjekfjnifuanef"
 
-            const res = await octokit.request('PUT /repos/{owner}/{repo}/contents/js-1/{path}', {
+            const updatedContentRes = await octokit.request('PUT /repos/{owner}/{repo}/contents/js-1/{path}', {
                 owner: 'suitcaseCoder',
                 repo: 'sample-content',
                 path: 'one.md',
@@ -134,8 +135,9 @@ export default {
                 sha: repoSHA,
                 branch: 'platform_updates'
             })
-            console.log('PUT REQUEST... response.data:', res.data);
-            return res
+            console.log('PUT REQUEST... response.data:', updatedContentRes.data);
+            this.$router.push({name: 'success', path:'/success'});
+            // return updatedContentRes
         }
 
     },
