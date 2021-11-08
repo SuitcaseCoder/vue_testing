@@ -10,8 +10,11 @@
   "dependencies": {
     "@octokit/core": "^3.5.1",
     "axios": "^0.24.0",
+    "cheerio": "^1.0.0-rc.10",
     "core-js": "^3.6.5",
     "es6-promise": "^4.2.8",
+    "showdown": "^1.9.1",
+    "showdown-highlight": "^2.1.8",
     "vue": "^3.0.0",
     "vue-router": "^4.0.12",
     "vuex": "^4.0.2"

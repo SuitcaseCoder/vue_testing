@@ -13,7 +13,7 @@ const routes = [
         },
     // Homepage route
         {
-            path: '/homepage',
+            path: '/',
             name:'homepage',
             component: Homepage
         },
