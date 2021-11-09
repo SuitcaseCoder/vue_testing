@@ -1,3 +1,13 @@
+// move to gocodeup / create own branch in https://github.com/gocodeup/ProjectPlatform
+// refactor curriculum / edit markdown / display markdown ( --> create a pull request )
+// as long as a PR was made from the the same branch to main , any changes that are committedm but aren't pushed will be added into that PR (will happen automatically until it's pushed)
+// create pull request after updated content
+// styling
+// create select menu, to select which files to edit (instead of statically one.md like now)
+// // --> use tree for structur of the project
+// // // --> every time a directory and/or file is hit, make a request to that file
+
+
 <template>
     <div class="curriculum-container">
         <section>
@@ -42,11 +52,10 @@ export default {
     data(){
         return {
             fileContentData: null,
-            updatedContent: {},
-            editSHA: "",
             originalMarkdown: null,
             updatedMarkdown: null,
-            latestSHA: null
+            latestSHA: null,
+            randomData: 'hello this is random data.'
             
         }
     },    
@@ -73,6 +82,8 @@ export default {
             console.log("updated md in updateMd: " , updatedMarkdown);
             this.updatedMarkdown = updatedMarkdown;
             console.log("updated md in state : " , this.updatedMarkdown);
+     
+
         },
         // ------- PUT REQUEST TO UPDATE GITHUB
         async handleUpdateContent(){
@@ -100,6 +111,28 @@ export default {
     async created (){
         const fetchedData = await this.fetchFileContents();
         this.fileContentData = fetchedData;
+
+
+
+
+        console.log("data: ", this.fileContentData.data);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         const currentFileMarkdown = window.atob(fetchedData.data.content);
         this.originalMarkdown = currentFileMarkdown;
         this.latestSHA = fetchedData.data.sha;
